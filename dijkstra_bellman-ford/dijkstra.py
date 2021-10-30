@@ -1,64 +1,50 @@
-import math
 from collections import defaultdict
+from heapq import *
 
+def dijkstra(edges, f, t):
+    g = defaultdict(list)
+    for l,r,c in edges:
+        g[l].append((c,r))
 
-class Vertex:
-    
+    q, seen, mins = [(0,f,())], set(), {f: 0}
+    while q:
+        (cost,v1,path) = heappop(q)
+        if v1 not in seen:
+            seen.add(v1)
+            path = (v1, path)
+            if v1 == t: return cost, path
 
-    def __init__(self, v: int, weigth: int = 0):
-        self.v = v
-        self.weight = weigth
-        self.d = math.inf
-        self.p = None
+            for c, v2 in g.get(v1, ()):
+                if v2 in seen: continue
+                prev = mins.get(v2, None)
+                next = cost + c
+                if prev is None or next < prev:
+                    mins[v2] = next
+                    heappush(q, (next, v2, path))
 
-
-class Graph:
-    
-    
-    def __init__(self, number_of_vertecies: int, number_of_edges: int):
-        self.n = number_of_vertecies
-        self.m = number_of_edges
-        self.graph = defaultdict(list)
-    
-
-    def print_graph(self):
-
-        for key, values in self.graph.items():
-            for node in values:
-                print(f"Edge {key} - {node.v}, w = {node.weight}")
-
-        
-
-        # for key in self.graph.keys():
-        #     for lst in self.graph.values():
-        #         for node in lst:
-        #             print(f"Edge {key} - {node.v}, w = {node.weight}", end=" ")
-        #         print()
-        
-    def add_edge(self, u: int, v: int, w: int):
-        self.graph[u].append(Vertex(v, w))
-        self.graph[v].append(Vertex(u, w))
-    
-    
-    def dijkstra_shortes_path(self, s: Vertexto: int):
-        pass
-
-def main():
-
-    n, m = [int(x) for x in input().split()]
-    f, s = [int(x) for x in input().split()]
-
-    g: Graph = Graph(n, m)
-
-    for _ in range(m):
-        u,v,w = [int(x) for x in input().split()]
-        g.add_edge(u,v,w)
-    
-    g.print_graph()
-
+    print(-1)
+    exit()
 
 if __name__ == "__main__":
-    main()
+    n, m = [int(x) for x in input().split()]
+    s, f = [int(x) for x in input().split()]
     
-        
+    edges = []
 
+    for i in range(m):
+        u,v,w = [int(x) for x in input().split()]
+        edges.append((u,v,w))
+        edges.append((v,u,w))
+    
+    print(*edges, sep = "\n")
+
+
+    out = dijkstra(edges, s,f)
+    print(out[0])
+    aux=[]
+    while len(out)>1:
+        aux.append(out[0])
+        out = out[1]
+    aux.reverse()
+    
+    print(*[aux[i] for i in range(len(aux)-1)])
